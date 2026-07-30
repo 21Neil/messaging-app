@@ -1,17 +1,77 @@
-import { Button } from '@mantine/core';
-import { Form } from 'react-router';
-import authService from '~/services/auth-service';
+import { Button, Container, Flex, Stack, Title } from '@mantine/core';
+import { Form, Link, useSubmit } from 'react-router';
+import authServices from '~/services/auth-services';
+import chatroomServices from '~/services/chatroom-services';
 import customNotifications from '~/utils/customNotifications';
+import type { Route } from './+types/home';
+import { MdAdd } from 'react-icons/md';
+import { useDisclosure } from '@mantine/hooks';
+import CreateChatroomModal from '~/components/create-chatroom-modal';
 
-export const clientAction = async () => {
+interface Chatroom {
+  id: number;
+  name: string;
+  members: Member[];
+}
+
+interface Member {
+  id: number;
+  avatar: string;
+  name: string;
+}
+
+export const clientLoader = async () => {
   try {
-    await authService.logout();
+    const chatrooms = await chatroomServices.getChatrooms();
+
+    return chatrooms.chatroom;
   } catch (err: any) {
-    customNotifications.showError(err.message || '登出失敗');
+    customNotifications.showError(err.message || '獲取聊天室失敗');
+    console.error(err);
   }
 };
 
-const Home = () => {
+export const clientAction = async ({ request }: Route.ClientActionArgs) => {
+  const formdata = await request.formData();
+  const intent = formdata.get('intent');
+
+  switch (intent) {
+    case 'logout': {
+      try {
+        await authServices.logout();
+      } catch (err: any) {
+        customNotifications.showError(err.message || '登出失敗');
+      }
+
+      break;
+    }
+
+    case 'create-chatroom': {
+      const name = formdata.get('name')?.toString();
+      const rawMembers = formdata.get('members')?.toString();
+      
+      if (!rawMembers) return customNotifications.showError('最少邀請一名成員');
+      
+      const members = rawMembers.split(',')
+      
+      try {
+        await chatroomServices.createChatroom({ name, members });
+        customNotifications.showSuccess('創建成功')
+      } catch (err: any) {
+        customNotifications.showError(err.message || '創建失敗');
+      }
+
+      break;
+    }
+
+    default:
+      customNotifications.showError('未知的操作類型');
+  }
+};
+
+const Home = ({ loaderData }: Route.ComponentProps) => {
+  const [opened, { open, close }] = useDisclosure(false);
+
   return (
     <>
       <div>
@@ -20,10 +80,24 @@ const Home = () => {
         <meta name='description' content='聊天室' />
       </div>
       <main>
-        <h1>test</h1>
-        <Form method='delete'>
-          <Button type='submit'>Logout</Button>
-        </Form>
+        <Flex py={18} px={18} align='center' justify='space-between'>
+          <Title size={24}>聊天室</Title>
+          <Button variant='transparent' color='black' fz={20} onClick={open}>
+            <MdAdd />
+          </Button>
+        </Flex>
+        {/* <Form method='delete'>
+          <Button type='submit' name='intent' value='logout'>
+            Logout
+          </Button>
+        </Form> */}
+        {loaderData.map((item: Chatroom) => (
+          <Link to={`/chatrooms/${item.id}`} key={item.id}>
+            <Container>{item.name}</Container>
+          </Link>
+        ))}
+
+        <CreateChatroomModal {...{ opened }} onClose={close} />
       </main>
     </>
   );

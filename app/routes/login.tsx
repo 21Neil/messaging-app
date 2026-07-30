@@ -1,9 +1,9 @@
 import { Button, PasswordInput, Stack, TextInput, Title } from '@mantine/core';
 import { schemaResolver, useForm } from '@mantine/form';
-import authService, {
+import authServices, {
   loginSchema,
   type LoginFormValues,
-} from '~/services/auth-service';
+} from '~/services/auth-services';
 import type { Route } from './+types/login';
 import { useSubmit } from 'react-router';
 import customNotification from '~/utils/customNotifications';
@@ -17,7 +17,7 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
     if (!username || !password)
       return customNotification.showError('未收到使用者名稱或密碼');
 
-    await authService.login({ username, password });
+    await authServices.login({ username, password });
   } catch (err: any) {
     customNotification.showError(err.message || '未收到使用者名稱或密碼');
   }

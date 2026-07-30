@@ -1,4 +1,4 @@
-import { apiDelete, apiPost } from './service';
+import { apiDelete, apiPost } from './services';
 import z from 'zod';
 
 export const loginSchema = z.object({
@@ -8,9 +8,9 @@ export const loginSchema = z.object({
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
-const authService = {
+const authServices = {
   login: (body: LoginFormValues) => apiPost('/auth/login', body),
   logout: () => apiDelete('/auth/logout'),
 };
 
-export default authService;
+export default authServices;
