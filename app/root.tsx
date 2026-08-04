@@ -8,11 +8,16 @@ import {
 } from 'react-router';
 
 import type { Route } from './+types/root';
-import './app.css';
+import './normalize.css'
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css'
-import { MantineProvider } from '@mantine/core';
+import './app.css';
+import { createTheme, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+
+const theme = createTheme({
+
+})
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -47,7 +52,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <MantineProvider>
+    <MantineProvider theme={theme}>
       <Notifications />
       <Outlet />
     </MantineProvider>
