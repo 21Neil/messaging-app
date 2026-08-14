@@ -1,5 +1,48 @@
 import z from 'zod';
 import { apiGet, apiPost } from './services';
+import Chatroom from '~/routes/chatroom';
+
+interface getChatroomsRes {
+  chatroom: Chatroom[];
+}
+
+interface getChatroomRes {
+  chatroom: Chatroom;
+}
+
+interface Chatroom {
+  id: number;
+  name: string;
+  members: Member[];
+  messages?: Message[];
+}
+
+export interface Member {
+  id: number;
+  avatar: string;
+  name: string;
+}
+
+export interface Message {
+  id: number;
+  content: string;
+  createAt: string;
+  chatroomId: number;
+  senderId: number;
+  sender: Sender;
+}
+
+interface Sender {
+  id: number;
+  name: string;
+  avatar: string;
+}
+
+const messageSchema = z.object({
+  content: z.string().min(1),
+});
+
+export type messageFromValue = z.infer<typeof messageSchema>;
 
 export const createChatroomSchema = z
   .object({
@@ -14,8 +57,12 @@ export const createChatroomSchema = z
 export type createChatroomFormValues = z.infer<typeof createChatroomSchema>;
 
 const chatroomServices = {
-  getChatrooms: () => apiGet('/chatrooms'),
-  createChatroom: (body: createChatroomFormValues) => apiPost('/chatrooms', body),
+  getChatrooms: () => apiGet<getChatroomsRes>('/chatrooms'),
+  createChatroom: (body: createChatroomFormValues) =>
+    apiPost('/chatrooms', body),
+  getChatroom: (id: number) => apiGet<getChatroomRes>(`/chatrooms/${id}`),
+  createMessage: (id: number, body: messageFromValue) =>
+    apiPost(`/chatrooms/${id}/messages`, body),
 };
 
 export default chatroomServices;

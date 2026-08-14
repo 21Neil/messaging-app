@@ -15,6 +15,7 @@
     "@mantine/notifications": "^9.5.0",
     "@react-router/node": "^8.3.0",
     "@react-router/serve": "^8.3.0",
+    "dayjs": "^1.11.21",
     "isbot": "^5.1.36",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
@@ -28,6 +29,9 @@
     "@types/node": "^22",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "postcss": "^8.5.25",
+    "postcss-preset-mantine": "^1.18.0",
+    "postcss-simple-vars": "^7.0.1",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.3"

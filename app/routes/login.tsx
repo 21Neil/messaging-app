@@ -8,19 +8,21 @@ import type { Route } from './+types/login';
 import { useSubmit } from 'react-router';
 import customNotification from '~/utils/customNotifications';
 
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const cookieHeader = request.headers.get('Cookie');
+
+  if (cookieHeader) authServices.logout();
+};
+
 export const clientAction = async ({ request }: Route.ClientActionArgs) => {
-  try {
-    const formdata = await request.formData();
-    const username = formdata.get('username')?.toString();
-    const password = formdata.get('password')?.toString();
+  const formdata = await request.formData();
+  const username = formdata.get('username')?.toString();
+  const password = formdata.get('password')?.toString();
 
-    if (!username || !password)
-      return customNotification.showError('未收到使用者名稱或密碼');
+  if (!username || !password)
+    return customNotification.showError('未收到使用者名稱或密碼');
 
-    await authServices.login({ username, password });
-  } catch (err: any) {
-    customNotification.showError(err.message || '未收到使用者名稱或密碼');
-  }
+  await authServices.login({ username, password });
 };
 
 const Login = () => {
@@ -41,11 +43,11 @@ const Login = () => {
 
   return (
     <>
-      <div>
+      <>
         <title>登入</title>
         <meta property='og:title' content='登入' />
         <meta name='description' content='登入' />
-      </div>
+      </>
       <Stack component='main' align='center' justify='center' h='100vh'>
         <Title>Messaging app</Title>
         <form onSubmit={form.onSubmit(handleSubmit)}>

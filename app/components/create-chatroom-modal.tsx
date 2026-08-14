@@ -2,7 +2,6 @@ import {
   Button,
   Group,
   Modal,
-  PillsInput,
   Stack,
   TagsInput,
   TextInput,
@@ -13,10 +12,7 @@ import {
   createChatroomSchema,
   type createChatroomFormValues,
 } from '~/services/chatroom-services';
-import type { Route } from '../routes/+types/home';
 import { useSubmit } from 'react-router';
-
-export const clientAction = async ({ request }: Route.ClientActionArgs) => {};
 
 const CreateChatroomModal = ({ opened, onClose }: ModalProps) => {
   const submit = useSubmit();
