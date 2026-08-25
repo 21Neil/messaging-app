@@ -8,18 +8,22 @@ import {
   Button,
   Divider,
   Flex,
+  Menu,
   ScrollArea,
   Stack,
   TextInput,
   Title,
 } from '@mantine/core';
-import { IoIosArrowBack } from 'react-icons/io';
+import { IoIosArrowBack, IoMdMore } from 'react-icons/io';
 import { useNavigate, useOutletContext, useSubmit } from 'react-router';
-import ChatMessage from '~/components/chat-message';
+import ChatMessage from '~/routes/chatroom/components/chat-message';
 import { Fragment, useEffect, useLayoutEffect, useRef } from 'react';
 import dayjs from 'dayjs';
 import { useForm } from '@mantine/form';
 import { IoSend } from 'react-icons/io5';
+import { useDisclosure } from '@mantine/hooks';
+import ChangeChatroomNameModal from '~/routes/chatroom/components/change-chatroom-name-modal';
+import customNotifications from '~/utils/customNotifications';
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   const id = +params.id;
@@ -33,22 +37,39 @@ export const clientAction = async ({
   params,
 }: Route.ClientActionArgs) => {
   const formdata = await request.formData();
-  const content = formdata.get('content')?.toString();
+  const intent = formdata.get('intent');
   const id = +params.id;
 
-  if (!content) return;
+  switch (intent) {
+    case 'send-message': {
+      const content = formdata.get('content')?.toString();
 
-  return await chatroomServices.createMessage(id, { content });
+      if (!content) break;
+
+      await chatroomServices.createMessage(id, { content });
+
+      break;
+    }
+    case 'change-name': {
+      const name = formdata.get('name')?.toString();
+
+      await chatroomServices.chagneChatroomName(id, { name });
+
+      break;
+    }
+
+    default:
+      customNotifications.showError('未知的操作類型');
+  }
 };
 
 const Chatroom = ({ loaderData }: Route.ComponentProps) => {
+  const roomData = loaderData;
+  const { user }: { user: Member } = useOutletContext() || {};
   const roomName =
-    loaderData &&
-    (loaderData.name ||
-      loaderData.members.map(member => member.name).toString());
+    roomData?.name ||
+    roomData?.members?.find(member => member.id !== user?.id)?.name;
   const messages = loaderData?.messages || [];
-  const context: { user: Member } = useOutletContext();
-  const user = context?.user;
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -59,13 +80,20 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
   const submit = useSubmit();
   const viewport = useRef<HTMLDivElement>(null);
   const firstEnter = useRef<boolean>(true);
+  const [changeOpened, changeHandlers] = useDisclosure(false);
 
   const handleBack = () => {
     navigate(-1);
   };
 
+  const handleChange = () => {
+    changeHandlers.open();
+  };
+
+  const handleDelete = () => {};
+
   const handleSubmit = async (values: messageFromValue) => {
-    await submit(values, { method: 'post' });
+    await submit({ ...values, intent: 'send-message' }, { method: 'post' });
     form.reset();
   };
 
@@ -80,7 +108,11 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
       firstEnter.current = false;
     }
 
-    if (user.id === messages[messages.length - 1].senderId) scrollToBottom();
+    if (
+      messages.length > 0 &&
+      user.id === messages[messages.length - 1].senderId
+    )
+      scrollToBottom();
   }, [user, messages]);
 
   return (
@@ -103,6 +135,26 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
               <IoIosArrowBack />
             </Button>
             <Title size={24}>{roomName}</Title>
+            <Menu>
+              <Menu.Target>
+                <Button
+                  ml='auto'
+                  variant='transparent'
+                  color='black'
+                  fz={20}
+                  px='xs'
+                >
+                  <IoMdMore />
+                </Button>
+              </Menu.Target>
+
+              <Menu.Dropdown>
+                <Menu.Item onClick={handleChange}>變更聊天室名稱</Menu.Item>
+                <Menu.Item c='red' onClick={handleDelete}>
+                  刪除聊天室
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           </Flex>
           <Divider />
           <ScrollArea
@@ -157,6 +209,12 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
             </Flex>
           </form>
         </Stack>
+        <ChangeChatroomNameModal
+          opened={changeOpened}
+          onClose={changeHandlers.close}
+          members={roomData && roomData.members}
+          name={roomData.name}
+        />
       </main>
     </>
   );

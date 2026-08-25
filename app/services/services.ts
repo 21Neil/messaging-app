@@ -19,7 +19,7 @@ const customFetch = async (endpoint: string, options: RequestInit = {}) => {
 
     return body;
   } catch (err: any) {
-    console.log(err.statusCode, err.code)
+    console.log(err.statusCode, err.code);
     if (err.statusCode === 401 && err.code !== 'INVALID_CREDENTIALS') {
       authServices.logout();
       throw redirect('/login');
@@ -36,6 +36,19 @@ export const apiGet = <T = any>(endpoint: string): Promise<T> =>
 export const apiPost = <T = any>(endpoint: string, body: unknown): Promise<T> =>
   customFetch(endpoint, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+    credentials: 'include',
+  });
+
+export const apiPatch = <T = any>(
+  endpoint: string,
+  body: unknown,
+): Promise<T> =>
+  customFetch(endpoint, {
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
     },

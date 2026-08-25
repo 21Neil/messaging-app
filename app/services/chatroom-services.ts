@@ -1,6 +1,6 @@
 import z from 'zod';
-import { apiGet, apiPost } from './services';
-import Chatroom from '~/routes/chatroom';
+import { apiGet, apiPatch, apiPost } from './services';
+import Chatroom from '~/routes/chatroom/chatroom';
 
 interface getChatroomsRes {
   chatroom: Chatroom[];
@@ -56,13 +56,24 @@ export const createChatroomSchema = z
 
 export type createChatroomFormValues = z.infer<typeof createChatroomSchema>;
 
+export const changeChatroomNameSchema = (members: Member[]) =>
+  z
+    .object({
+      name: z.string().optional(),
+    })
+    .refine(data => !(members.length > 2 && !data.name), {
+      error: '請輸入聊天室名稱',
+      path: ['name'],
+    });
+
+export type changeChatroomNameFormValues = z.infer<ReturnType<typeof changeChatroomNameSchema>>;
+
 const chatroomServices = {
   getChatrooms: () => apiGet<getChatroomsRes>('/chatrooms'),
-  createChatroom: (body: createChatroomFormValues) =>
-    apiPost('/chatrooms', body),
+  createChatroom: (body: createChatroomFormValues) =>  apiPost('/chatrooms', body),
   getChatroom: (id: number) => apiGet<getChatroomRes>(`/chatrooms/${id}`),
-  createMessage: (id: number, body: messageFromValue) =>
-    apiPost(`/chatrooms/${id}/messages`, body),
+  createMessage: (id: number, body: messageFromValue) => apiPost(`/chatrooms/${id}/messages`, body),
+  chagneChatroomName: (id: number, body: changeChatroomNameFormValues) => apiPatch<any>(`/chatrooms/${id}`, body),
 };
 
 export default chatroomServices;

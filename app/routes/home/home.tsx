@@ -6,7 +6,7 @@ import customNotifications from '~/utils/customNotifications';
 import type { Route } from './+types/home';
 import { MdAdd } from 'react-icons/md';
 import { useDisclosure } from '@mantine/hooks';
-import CreateChatroomModal from '~/components/create-chatroom-modal';
+import CreateChatroomModal from '~/routes/home/components/create-chatroom-modal';
 import { Fragment } from 'react';
 
 export const clientLoader = async () => {

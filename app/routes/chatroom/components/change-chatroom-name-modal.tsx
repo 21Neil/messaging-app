@@ -3,44 +3,57 @@ import {
   Group,
   Modal,
   Stack,
-  TagsInput,
   TextInput,
   type ModalProps,
 } from '@mantine/core';
 import { schemaResolver, useForm } from '@mantine/form';
 import {
-  createChatroomSchema,
-  type createChatroomFormValues,
+  changeChatroomNameSchema,
+  type changeChatroomNameFormValues,
+  type Member,
 } from '~/services/chatroom-services';
 import { useSubmit } from 'react-router';
+import { useEffect } from 'react';
 
-const CreateChatroomModal = ({ opened, onClose }: ModalProps) => {
+interface ChangeChatroomNameModalProps extends ModalProps {
+  members: Member[];
+  name: string;
+}
+
+const ChangeChatroomNameModal = ({
+  opened,
+  onClose,
+  members,
+  name,
+}: ChangeChatroomNameModalProps) => {
   const submit = useSubmit();
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      name: '',
-      members: [],
+      name,
     },
-    validate: schemaResolver(createChatroomSchema),
+    validate: schemaResolver(changeChatroomNameSchema(members)),
   });
 
   const handleClose = () => {
-    onClose();
     form.reset();
+    onClose();
   };
 
-  const handleSubmit = (values: createChatroomFormValues) => {
-    submit({ ...values, intent: 'create-chatroom' }, { method: 'post' });
+  const handleSubmit = (values: changeChatroomNameFormValues) => {
+    submit({ ...values, intent: 'change-name' }, { method: 'post' });
     onClose();
-    form.reset();
   };
+
+  useEffect(() => {
+    form.setInitialValues({ name });
+  }, [name]);
 
   return (
     <Modal
       opened={opened}
       onClose={close}
-      title='創建聊天室'
+      title='變更聊天室名稱'
       closeOnClickOutside={false}
       closeOnEscape={false}
       withCloseButton={false}
@@ -53,17 +66,11 @@ const CreateChatroomModal = ({ opened, onClose }: ModalProps) => {
             {...form.getInputProps('name')}
             label='名稱'
           />
-          <TagsInput
-            label='成員'
-            placeholder='請輸入使用者名稱'
-            key={form.key('members')}
-            {...form.getInputProps('members')}
-          />
           <Group justify='end'>
             <Button type='button' color='gray' onClick={handleClose}>
-              Cancel
+              取消
             </Button>
-            <Button type='submit'>Create</Button>
+            <Button type='submit'>變更</Button>
           </Group>
         </Stack>
       </form>
@@ -71,4 +78,4 @@ const CreateChatroomModal = ({ opened, onClose }: ModalProps) => {
   );
 };
 
-export default CreateChatroomModal;
+export default ChangeChatroomNameModal;
