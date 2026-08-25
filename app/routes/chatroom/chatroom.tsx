@@ -9,6 +9,7 @@ import customNotifications from '~/utils/customNotifications';
 import Header from './components/header';
 import ChatArea from './components/chat-area';
 import ChatInput from './components/chat-input';
+import DeleteChatroomConfirmModal from './components/delete-chatroom-confirm-modal';
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   const id = +params.id;
@@ -38,7 +39,7 @@ export const clientAction = async ({
     case 'change-name': {
       const name = formdata.get('name')?.toString();
 
-      await chatroomServices.chagneChatroomName(id, { name });
+      await chatroomServices.changeChatroomName(id, { name });
 
       break;
     }
@@ -101,6 +102,11 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
           onClose={changeHandlers.close}
           members={roomData && roomData.members}
           name={roomData.name}
+        />
+        <DeleteChatroomConfirmModal
+          opened={deleteConfirmOpened}
+          onClose={deleteConfirmHandlers.close}
+          roomId={roomData.id}
         />
       </main>
     </>

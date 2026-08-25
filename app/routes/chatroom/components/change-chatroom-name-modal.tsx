@@ -52,10 +52,8 @@ const ChangeChatroomNameModal = ({
   return (
     <Modal
       opened={opened}
-      onClose={close}
+      onClose={onClose}
       title='變更聊天室名稱'
-      closeOnClickOutside={false}
-      closeOnEscape={false}
       withCloseButton={false}
       centered
     >

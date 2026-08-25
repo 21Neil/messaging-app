@@ -1,5 +1,5 @@
 import z from 'zod';
-import { apiGet, apiPatch, apiPost } from './services';
+import { apiDelete, apiGet, apiPatch, apiPost } from './services';
 import Chatroom from '~/routes/chatroom/chatroom';
 
 interface getChatroomsRes {
@@ -73,7 +73,8 @@ const chatroomServices = {
   createChatroom: (body: createChatroomFormValues) =>  apiPost('/chatrooms', body),
   getChatroom: (id: number) => apiGet<getChatroomRes>(`/chatrooms/${id}`),
   createMessage: (id: number, body: messageFromValue) => apiPost(`/chatrooms/${id}/messages`, body),
-  chagneChatroomName: (id: number, body: changeChatroomNameFormValues) => apiPatch<any>(`/chatrooms/${id}`, body),
+  changeChatroomName: (id: number, body: changeChatroomNameFormValues) => apiPatch(`/chatrooms/${id}`, body),
+  deleteChatroom: (id: number) => apiDelete(`/chatrooms/${id}`),
 };
 
 export default chatroomServices;
