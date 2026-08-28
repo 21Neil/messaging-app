@@ -5,7 +5,7 @@ import authServices, {
   type LoginFormValues,
 } from '~/services/auth-services';
 import type { Route } from './+types/login';
-import { useSubmit } from 'react-router';
+import { useNavigate, useSubmit } from 'react-router';
 import customNotification from '~/utils/customNotifications';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -27,6 +27,7 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
 
 const Login = () => {
   const submit = useSubmit();
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormValues>({
     mode: 'uncontrolled',
@@ -63,6 +64,13 @@ const Login = () => {
               label='Password'
             />
             <Button type='submit'>Login</Button>
+            <Button
+              type='button'
+              color='gray'
+              onClick={() => navigate('/register')}
+            >
+              Register
+            </Button>
           </Stack>
         </form>
       </Stack>
