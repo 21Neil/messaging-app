@@ -75,6 +75,7 @@ const chatroomServices = {
   createMessage: (id: number, body: messageFromValue) => apiPost(`/chatrooms/${id}/messages`, body),
   changeChatroomName: (id: number, body: changeChatroomNameFormValues) => apiPatch(`/chatrooms/${id}`, body),
   deleteChatroom: (id: number) => apiDelete(`/chatrooms/${id}`),
+  leaveChatroom: (id: number) => apiDelete(`/chatrooms/${id}/members`),
 };
 
 export default chatroomServices;

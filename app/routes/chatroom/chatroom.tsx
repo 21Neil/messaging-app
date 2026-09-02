@@ -1,15 +1,15 @@
 import chatroomServices, { type Member } from '~/services/chatroom-services';
 import type { Route } from './+types/chatroom';
 import { Stack } from '@mantine/core';
-import { useOutletContext, useSubmit } from 'react-router';
-import { useEffect, useRef } from 'react';
+import { useNavigate, useOutletContext, useSubmit } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import ChangeChatroomNameModal from '~/routes/chatroom/components/change-chatroom-name-modal';
 import customNotifications from '~/utils/customNotifications';
 import Header from './components/header';
 import ChatArea from './components/chat-area';
 import ChatInput from './components/chat-input';
-import DeleteChatroomConfirmModal from './components/delete-chatroom-confirm-modal';
+import ConfirmModal from './components/confirm-modal';
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   const id = +params.id;
@@ -60,7 +60,21 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
   const viewport = useRef<HTMLDivElement>(null);
   const firstEnter = useRef<boolean>(true);
   const [changeOpened, changeHandlers] = useDisclosure(false);
-  const [deleteConfirmOpened, deleteConfirmHandlers] = useDisclosure(false);
+  const [leaveConfirmModalOpened, leaveConfirmModalHandlers] = useDisclosure(false);
+  const [deleteConfirmModalOpened, deleteConfirmModalHandlers] = useDisclosure(false);
+  const navigate = useNavigate();
+
+  const onLeaveConfirm = async () => {
+    const res = await chatroomServices.leaveChatroom(roomData.id);
+
+    if (res) navigate(-1);
+  };
+
+  const onDeleteConfirm = async () => {
+    const res = await chatroomServices.deleteChatroom(roomData.id);
+
+    if (res) navigate(-1);
+  };
 
   const scrollToBottom = () =>
     viewport.current!.scrollTo({ top: viewport.current!.scrollHeight });
@@ -92,7 +106,8 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
           <Header
             roomName={roomName}
             handleChange={changeHandlers.open}
-            handleDelete={deleteConfirmHandlers.open}
+            handleLeave={leaveConfirmModalHandlers.open}
+            handleDelete={deleteConfirmModalHandlers.open}
           />
           <ChatArea messages={messages} viewport={viewport} user={user} />
           <ChatInput />
@@ -103,10 +118,17 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
           members={roomData && roomData.members}
           name={roomData.name}
         />
-        <DeleteChatroomConfirmModal
-          opened={deleteConfirmOpened}
-          onClose={deleteConfirmHandlers.close}
-          roomId={roomData.id}
+        <ConfirmModal
+          opened={leaveConfirmModalOpened}
+          onClose={leaveConfirmModalHandlers.close}
+          title='離開聊天室'
+          onConfirm={onLeaveConfirm}
+        />
+        <ConfirmModal
+          opened={deleteConfirmModalOpened}
+          onClose={deleteConfirmModalHandlers.close}
+          title='刪除聊天室'
+          onConfirm={onDeleteConfirm}
         />
       </main>
     </>

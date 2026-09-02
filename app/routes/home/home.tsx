@@ -34,8 +34,9 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
 
       const members = rawMembers.split(',');
 
-      await chatroomServices.createChatroom({ name, members });
-      customNotifications.showSuccess('創建成功');
+      const res = await chatroomServices.createChatroom({ name, members });
+
+      if (res) customNotifications.showSuccess('創建成功');
 
       break;
     }

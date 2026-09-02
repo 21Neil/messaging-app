@@ -5,10 +5,11 @@ import { useNavigate } from 'react-router';
 interface HeaderProps {
   roomName: string;
   handleChange: () => void;
+  handleLeave: () => void;
   handleDelete: () => void;
 }
 
-const Header = ({ roomName, handleChange, handleDelete }: HeaderProps) => {
+const Header = ({ roomName, handleChange, handleLeave, handleDelete }: HeaderProps) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -43,6 +44,7 @@ const Header = ({ roomName, handleChange, handleDelete }: HeaderProps) => {
 
           <Menu.Dropdown>
             <Menu.Item onClick={handleChange}>變更聊天室名稱</Menu.Item>
+            <Menu.Item c='red' onClick={handleLeave}>離開聊天室</Menu.Item>
             <Menu.Item c='red' onClick={handleDelete}>
               刪除聊天室
             </Menu.Item>
