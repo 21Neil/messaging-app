@@ -2,11 +2,11 @@ import z from 'zod';
 import { apiDelete, apiGet, apiPatch, apiPost } from './services';
 import Chatroom from '~/routes/chatroom/chatroom';
 
-interface getChatroomsRes {
+interface GetChatroomsRes {
   chatroom: Chatroom[];
 }
 
-interface getChatroomRes {
+interface GetChatroomRes {
   chatroom: Chatroom;
 }
 
@@ -42,7 +42,7 @@ const messageSchema = z.object({
   content: z.string().min(1),
 });
 
-export type messageFromValue = z.infer<typeof messageSchema>;
+export type MessageFromValue = z.infer<typeof messageSchema>;
 
 export const createChatroomSchema = z
   .object({
@@ -54,7 +54,7 @@ export const createChatroomSchema = z
     path: ['name'],
   });
 
-export type createChatroomFormValues = z.infer<typeof createChatroomSchema>;
+export type CreateChatroomFormValues = z.infer<typeof createChatroomSchema>;
 
 export const changeChatroomNameSchema = (members: Member[]) =>
   z
@@ -66,16 +66,24 @@ export const changeChatroomNameSchema = (members: Member[]) =>
       path: ['name'],
     });
 
-export type changeChatroomNameFormValues = z.infer<ReturnType<typeof changeChatroomNameSchema>>;
+export type ChangeChatroomNameFormValues = z.infer<ReturnType<typeof changeChatroomNameSchema>>;
+
+export const joinChatroomFormSchema = z
+  .object({
+    usernames: z.array(z.string()).min(1, { message: '最少邀請一個成員'})
+  })
+
+export type JoinChatroomFormValues = z.infer<typeof joinChatroomFormSchema>;
 
 const chatroomServices = {
-  getChatrooms: () => apiGet<getChatroomsRes>('/chatrooms'),
-  createChatroom: (body: createChatroomFormValues) =>  apiPost('/chatrooms', body),
-  getChatroom: (id: number) => apiGet<getChatroomRes>(`/chatrooms/${id}`),
-  createMessage: (id: number, body: messageFromValue) => apiPost(`/chatrooms/${id}/messages`, body),
-  changeChatroomName: (id: number, body: changeChatroomNameFormValues) => apiPatch(`/chatrooms/${id}`, body),
+  getChatrooms: () => apiGet<GetChatroomsRes>('/chatrooms'),
+  createChatroom: (body: CreateChatroomFormValues) =>  apiPost('/chatrooms', body),
+  getChatroom: (id: number) => apiGet<GetChatroomRes>(`/chatrooms/${id}`),
+  createMessage: (id: number, body: MessageFromValue) => apiPost(`/chatrooms/${id}/messages`, body),
+  changeChatroomName: (id: number, body: ChangeChatroomNameFormValues) => apiPatch(`/chatrooms/${id}`, body),
   deleteChatroom: (id: number) => apiDelete(`/chatrooms/${id}`),
   leaveChatroom: (id: number) => apiDelete(`/chatrooms/${id}/members`),
+  joinChatroom: (id: number, body: JoinChatroomFormValues) => apiPost(`/chatrooms/${id}/members`, body),
 };
 
 export default chatroomServices;

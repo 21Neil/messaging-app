@@ -4,12 +4,13 @@ import { Stack } from '@mantine/core';
 import { useNavigate, useOutletContext, useSubmit } from 'react-router';
 import { useEffect, useRef, useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import ChangeChatroomNameModal from '~/routes/chatroom/components/change-chatroom-name-modal';
+import ChangeModal from '~/routes/chatroom/components/change-modal';
 import customNotifications from '~/utils/customNotifications';
 import Header from './components/header';
 import ChatArea from './components/chat-area';
 import ChatInput from './components/chat-input';
 import ConfirmModal from './components/confirm-modal';
+import JoinModal from './components/join-modal';
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   const id = +params.id;
@@ -36,6 +37,18 @@ export const clientAction = async ({
 
       break;
     }
+    case 'join': {
+      console.log('first')
+      const rawUsernames = formdata.get('usernames')?.toString();
+
+      if (!rawUsernames) break;
+
+      const usernames = rawUsernames.split(',');
+
+      await chatroomServices.joinChatroom(id, { usernames });
+
+      break;
+    }
     case 'change-name': {
       const name = formdata.get('name')?.toString();
 
@@ -59,8 +72,9 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
   const messages = loaderData?.messages || [];
   const viewport = useRef<HTMLDivElement>(null);
   const firstEnter = useRef<boolean>(true);
-  const [changeOpened, changeHandlers] = useDisclosure(false);
-  const [leaveConfirmModalOpened, leaveConfirmModalHandlers] = useDisclosure(false);
+  const [joinModalOpened, joinModalHandlers] = useDisclosure(false);
+  const [changeModalOpened, changeModalHandlers] = useDisclosure(false);
+  const [leaveConfirmModalOpened, leaveConfirmModalHandlers] =  useDisclosure(false);
   const [deleteConfirmModalOpened, deleteConfirmModalHandlers] = useDisclosure(false);
   const navigate = useNavigate();
 
@@ -105,16 +119,18 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
         <Stack gap={0}>
           <Header
             roomName={roomName}
-            handleChange={changeHandlers.open}
+            handleJoin={joinModalHandlers.open}
+            handleChange={changeModalHandlers.open}
             handleLeave={leaveConfirmModalHandlers.open}
             handleDelete={deleteConfirmModalHandlers.open}
           />
           <ChatArea messages={messages} viewport={viewport} user={user} />
           <ChatInput />
         </Stack>
-        <ChangeChatroomNameModal
-          opened={changeOpened}
-          onClose={changeHandlers.close}
+        <JoinModal opened={joinModalOpened} onClose={joinModalHandlers.close} />
+        <ChangeModal
+          opened={changeModalOpened}
+          onClose={changeModalHandlers.close}
           members={roomData && roomData.members}
           name={roomData.name}
         />

@@ -10,7 +10,7 @@ import {
 import { schemaResolver, useForm } from '@mantine/form';
 import {
   createChatroomSchema,
-  type createChatroomFormValues,
+  type CreateChatroomFormValues,
 } from '~/services/chatroom-services';
 import { useSubmit } from 'react-router';
 
@@ -30,7 +30,7 @@ const CreateChatroomModal = ({ opened, onClose }: ModalProps) => {
     form.reset();
   };
 
-  const handleSubmit = (values: createChatroomFormValues) => {
+  const handleSubmit = (values: CreateChatroomFormValues) => {
     submit({ ...values, intent: 'create-chatroom' }, { method: 'post' });
     onClose();
     form.reset();

@@ -9,23 +9,23 @@ import {
 import { schemaResolver, useForm } from '@mantine/form';
 import {
   changeChatroomNameSchema,
-  type changeChatroomNameFormValues,
+  type ChangeChatroomNameFormValues,
   type Member,
 } from '~/services/chatroom-services';
 import { useSubmit } from 'react-router';
 import { useEffect } from 'react';
 
-interface ChangeChatroomNameModalProps extends ModalProps {
+interface ChangeModalProps extends ModalProps {
   members: Member[];
   name: string;
 }
 
-const ChangeChatroomNameModal = ({
+const ChangeModal = ({
   opened,
   onClose,
   members,
   name,
-}: ChangeChatroomNameModalProps) => {
+}: ChangeModalProps) => {
   const submit = useSubmit();
   const form = useForm({
     mode: 'uncontrolled',
@@ -40,7 +40,7 @@ const ChangeChatroomNameModal = ({
     onClose();
   };
 
-  const handleSubmit = (values: changeChatroomNameFormValues) => {
+  const handleSubmit = (values: ChangeChatroomNameFormValues) => {
     submit({ ...values, intent: 'change-name' }, { method: 'post' });
     onClose();
   };
@@ -76,4 +76,4 @@ const ChangeChatroomNameModal = ({
   );
 };
 
-export default ChangeChatroomNameModal;
+export default ChangeModal;

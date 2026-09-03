@@ -2,7 +2,7 @@ import { Button, Flex, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IoSend } from 'react-icons/io5';
 import { useSubmit } from 'react-router';
-import type { messageFromValue } from '~/services/chatroom-services';
+import type { MessageFromValue } from '~/services/chatroom-services';
 
 const ChatInput = () => {
   const submit = useSubmit();
@@ -13,7 +13,7 @@ const ChatInput = () => {
     },
   });
 
-  const handleSubmit = async (values: messageFromValue) => {
+  const handleSubmit = async (values: MessageFromValue) => {
     await submit({ ...values, intent: 'send-message' }, { method: 'post' });
     form.reset();
   };
