@@ -68,12 +68,16 @@ export const changeChatroomNameSchema = (members: Member[]) =>
 
 export type ChangeChatroomNameFormValues = z.infer<ReturnType<typeof changeChatroomNameSchema>>;
 
-export const joinChatroomFormSchema = z
+export const joinChatroomFormSchema = (hasRoomName: boolean) => z
   .object({
     usernames: z.array(z.string()).min(1, { message: '最少邀請一個成員'})
   })
+  .refine(() => hasRoomName, {
+    error: '請先變更聊天室名稱',
+    path: ['usernames']
+  })
 
-export type JoinChatroomFormValues = z.infer<typeof joinChatroomFormSchema>;
+export type JoinChatroomFormValues = z.infer<ReturnType<typeof joinChatroomFormSchema>>;
 
 const chatroomServices = {
   getChatrooms: () => apiGet<GetChatroomsRes>('/chatrooms'),

@@ -11,6 +11,7 @@ import ChatArea from './components/chat-area';
 import ChatInput from './components/chat-input';
 import ConfirmModal from './components/confirm-modal';
 import JoinModal from './components/join-modal';
+import chatroomUtils from '~/utils/chatroom';
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   const id = +params.id;
@@ -38,22 +39,23 @@ export const clientAction = async ({
       break;
     }
     case 'join': {
-      console.log('first')
       const rawUsernames = formdata.get('usernames')?.toString();
 
       if (!rawUsernames) break;
 
       const usernames = rawUsernames.split(',');
+      const res = await chatroomServices.joinChatroom(id, { usernames });
 
-      await chatroomServices.joinChatroom(id, { usernames });
+      if (res) customNotifications.showSuccess('邀請成功！')
 
       break;
     }
     case 'change-name': {
       const name = formdata.get('name')?.toString();
+      const res = await chatroomServices.changeChatroomName(id, { name });
 
-      await chatroomServices.changeChatroomName(id, { name });
-
+      if (res) customNotifications.showSuccess('更改成功！')
+        
       break;
     }
 
@@ -65,17 +67,17 @@ export const clientAction = async ({
 const Chatroom = ({ loaderData }: Route.ComponentProps) => {
   const roomData = loaderData;
   const { user }: { user: Member } = useOutletContext() || {};
-  const roomName =
-    roomData?.name ||
-    roomData?.members?.find(member => member.id !== user?.id)?.name ||
-    '未成功取得名稱';
+  const roomName = roomData?.name || chatroomUtils.getRoomName(roomData?.members, user?.id);
+  const hasRoomName = !!roomData?.name;
   const messages = loaderData?.messages || [];
   const viewport = useRef<HTMLDivElement>(null);
   const firstEnter = useRef<boolean>(true);
+
   const [joinModalOpened, joinModalHandlers] = useDisclosure(false);
   const [changeModalOpened, changeModalHandlers] = useDisclosure(false);
-  const [leaveConfirmModalOpened, leaveConfirmModalHandlers] =  useDisclosure(false);
+  const [leaveConfirmModalOpened, leaveConfirmModalHandlers] = useDisclosure(false);
   const [deleteConfirmModalOpened, deleteConfirmModalHandlers] = useDisclosure(false);
+
   const navigate = useNavigate();
 
   const onLeaveConfirm = async () => {
@@ -127,7 +129,11 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
           <ChatArea messages={messages} viewport={viewport} user={user} />
           <ChatInput />
         </Stack>
-        <JoinModal opened={joinModalOpened} onClose={joinModalHandlers.close} />
+        <JoinModal
+          opened={joinModalOpened}
+          onClose={joinModalHandlers.close}
+          hasRoomName={hasRoomName}
+        />
         <ChangeModal
           opened={changeModalOpened}
           onClose={changeModalHandlers.close}

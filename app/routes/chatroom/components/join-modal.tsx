@@ -13,15 +13,17 @@ import {
   type JoinChatroomFormValues,
 } from '~/services/chatroom-services';
 
-interface JoinModalProps extends ModalProps {}
+interface JoinModalProps extends ModalProps {
+  hasRoomName: boolean;
+}
 
-const JoinModal = ({ opened, onClose }: JoinModalProps) => {
+const JoinModal = ({ opened, onClose, hasRoomName }: JoinModalProps) => {
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
       usernames: [],
     },
-    validate: schemaResolver(joinChatroomFormSchema),
+    validate: schemaResolver(joinChatroomFormSchema(hasRoomName)),
   });
   const submit = useSubmit();
 
@@ -31,9 +33,9 @@ const JoinModal = ({ opened, onClose }: JoinModalProps) => {
   };
 
   const handleSubmit = (values: JoinChatroomFormValues) => {
-    console.log('first')
     submit({ ...values, intent: 'join' }, { method: 'post' });
     onClose();
+    form.reset();
   };
 
   return (

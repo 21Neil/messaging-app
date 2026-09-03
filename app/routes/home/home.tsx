@@ -1,13 +1,14 @@
 import { Button, Card, Divider, Flex, Text, Title } from '@mantine/core';
-import { Link } from 'react-router';
+import { Link, useOutletContext } from 'react-router';
 import authServices from '~/services/auth-services';
-import chatroomServices from '~/services/chatroom-services';
+import chatroomServices, { type Member } from '~/services/chatroom-services';
 import customNotifications from '~/utils/customNotifications';
 import type { Route } from './+types/home';
 import { MdAdd } from 'react-icons/md';
 import { useDisclosure } from '@mantine/hooks';
 import CreateChatroomModal from '~/routes/home/components/create-chatroom-modal';
 import { Fragment } from 'react';
+import chatroomUtils from '~/utils/chatroom';
 
 export const clientLoader = async () => {
   const chatrooms = await chatroomServices.getChatrooms();
@@ -48,6 +49,7 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
 
 const Home = ({ loaderData }: Route.ComponentProps) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const { user }: { user: Member } = useOutletContext() || {};
 
   return (
     <>
@@ -81,9 +83,9 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
                 <Link to={`/chatroom/${item.id}`}>
                   <Flex justify='space-between' py={8}>
                     <Title order={2} size={18}>
-                      {item.name || item.members.map(member => member.name)}
+                      {item.name || chatroomUtils.getRoomName(item.members, user?.id)}
                     </Title>
-                    <Text>{item.members.length + 1}人</Text>
+                    <Text>{item.members.length}人</Text>
                   </Flex>
                 </Link>
               </Card>
