@@ -12,6 +12,7 @@ import ChatInput from './components/chat-input';
 import ConfirmModal from './components/confirm-modal';
 import JoinModal from './components/join-modal';
 import chatroomUtils from '~/utils/chatroom';
+import MembersModal from './components/members-modal';
 
 export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   const id = +params.id;
@@ -55,7 +56,7 @@ export const clientAction = async ({
       const res = await chatroomServices.changeChatroomName(id, { name });
 
       if (res) customNotifications.showSuccess('更改成功！')
-        
+
       break;
     }
 
@@ -73,6 +74,7 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
   const viewport = useRef<HTMLDivElement>(null);
   const firstEnter = useRef<boolean>(true);
 
+  const [membersModalOpened, membersModalHandlers] = useDisclosure(false);
   const [joinModalOpened, joinModalHandlers] = useDisclosure(false);
   const [changeModalOpened, changeModalHandlers] = useDisclosure(false);
   const [leaveConfirmModalOpened, leaveConfirmModalHandlers] = useDisclosure(false);
@@ -121,6 +123,7 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
         <Stack gap={0}>
           <Header
             roomName={roomName}
+            handleMembers={membersModalHandlers.open}
             handleJoin={joinModalHandlers.open}
             handleChange={changeModalHandlers.open}
             handleLeave={leaveConfirmModalHandlers.open}
@@ -129,6 +132,12 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
           <ChatArea messages={messages} viewport={viewport} user={user} />
           <ChatInput />
         </Stack>
+
+        <MembersModal 
+          opened={membersModalOpened}
+          onClose={membersModalHandlers.close}
+          members={roomData.members}
+        />
         <JoinModal
           opened={joinModalOpened}
           onClose={joinModalHandlers.close}
