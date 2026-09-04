@@ -1,15 +1,15 @@
 import chatroomServices, { type Member } from '~/services/chatroom-services';
 import type { Route } from './+types/chatroom';
 import { Stack } from '@mantine/core';
-import { useNavigate, useOutletContext, useSubmit } from 'react-router';
-import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router';
+import { useEffect, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import ChangeModal from '~/routes/chatroom/components/change-modal';
 import customNotifications from '~/utils/customNotifications';
 import Header from './components/header';
 import ChatArea from './components/chat-area';
 import ChatInput from './components/chat-input';
-import ConfirmModal from './components/confirm-modal';
+import ConfirmModal from '../../components/confirm-modal';
 import JoinModal from './components/join-modal';
 import chatroomUtils from '~/utils/chatroom';
 import MembersModal from './components/members-modal';

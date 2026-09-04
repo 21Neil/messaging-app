@@ -1,5 +1,5 @@
-import { Button, Card, Divider, Flex, Text, Title } from '@mantine/core';
-import { Link, useOutletContext } from 'react-router';
+import { Button, Card, Divider, Flex, Menu, Text, Title } from '@mantine/core';
+import { Link, useOutletContext, useSubmit } from 'react-router';
 import authServices from '~/services/auth-services';
 import chatroomServices, { type Member } from '~/services/chatroom-services';
 import customNotifications from '~/utils/customNotifications';
@@ -9,6 +9,8 @@ import { useDisclosure } from '@mantine/hooks';
 import CreateChatroomModal from '~/routes/home/components/create-chatroom-modal';
 import { Fragment } from 'react';
 import chatroomUtils from '~/utils/chatroom';
+import { IoMdMore } from 'react-icons/io';
+import ConfirmModal from '~/components/confirm-modal';
 
 export const clientLoader = async () => {
   const chatrooms = await chatroomServices.getChatrooms();
@@ -22,7 +24,9 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
 
   switch (intent) {
     case 'logout': {
-      await authServices.logout();
+      const res = await authServices.logout();
+
+      if (res) customNotifications.showSuccess('登出成功')
 
       break;
     }
@@ -48,8 +52,14 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
 };
 
 const Home = ({ loaderData }: Route.ComponentProps) => {
-  const [opened, { open, close }] = useDisclosure(false);
+  const [confirmModalOpened, confirmModalHandler] = useDisclosure(false);
+  const [createModalOpened, createModalHandler] = useDisclosure(false);
   const { user }: { user: Member } = useOutletContext() || {};
+  const submit = useSubmit();
+
+  const handleLogout = async () => {
+    await submit({ intent: 'logout' }, { method: 'delete' })
+  }
 
   return (
     <>
@@ -61,21 +71,24 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
       <main>
         <Flex py={18} px={18} align='center' justify='space-between'>
           <Title size={24}>聊天室</Title>
-          <Button
-            variant='transparent'
-            color='black'
-            fz={20}
-            onClick={open}
-            px='xs'
-          >
-            <MdAdd />
-          </Button>
+          <Menu>
+            <Menu.Target>
+              <Button
+                variant='transparent'
+                color='black'
+                fz={20}
+                px='xs'
+              >
+                <IoMdMore />
+              </Button>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Item onClick={createModalHandler.open}>創建聊天室</Menu.Item>
+              <Menu.Item c='red' onClick={confirmModalHandler.open}>登出</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </Flex>
-        {/* <Form method='delete'>
-          <Button type='submit' name='intent' value='logout'>
-            Logout
-          </Button>
-        </Form> */}
         {loaderData &&
           loaderData.map(item => (
             <Fragment key={item.id}>
@@ -93,7 +106,13 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
             </Fragment>
           ))}
 
-        <CreateChatroomModal {...{ opened }} onClose={close} />
+        <ConfirmModal
+          opened={confirmModalOpened}
+          onClose={confirmModalHandler.close}
+          title='確認登出'
+          onConfirm={handleLogout}
+        />
+        <CreateChatroomModal opened={createModalOpened} onClose={createModalHandler.close} />
       </main>
     </>
   );
