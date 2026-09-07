@@ -19,24 +19,23 @@ const AuthLayout = ({ loaderData }: Route.ComponentProps) => {
   const registerMatch = useMatch('register');
   const navigate = useNavigate();
 
+  const getUser = async () => {
+    try {
+      const user = await authServices.me();
+
+      setUser(user.user);
+    } catch (err: any) {
+      customNotifications.showError(err.message || '獲取使用者失敗');
+    }
+  };
+
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const user = await authServices.me();
-
-        setUser(user);
-      } catch (err: any) {
-        customNotifications.showError(err.message || '獲取使用者失敗');
-      }
-    };
-
-    if (hasToken && (loginMatch || registerMatch))
-      navigate('/');
-
+    if (hasToken && (loginMatch || registerMatch)) navigate('/');
     if (hasToken && !user) getUser();
+    if (!hasToken) navigate('login');
   }, [hasToken]);
 
-  return <Outlet context={user} />;
+  return <Outlet context={{ user, getUser }} />;
 };
 
 export default AuthLayout;

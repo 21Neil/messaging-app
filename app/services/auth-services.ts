@@ -1,3 +1,4 @@
+import { nameSchema, passwordSchema } from './common-schema';
 import { apiDelete, apiGet, apiPost } from './services';
 import z from 'zod';
 
@@ -9,15 +10,7 @@ const usernameSchema = z
   .regex(/^[A-Za-z0-9_]+$/, {
     message: '使用者名稱只能有字母，數字還有底線',
   });
-const passwordSchema = z
-  .string()
-  .min(8, { message: '密碼需多於8字元' })
-  .max(100, { message: '密碼需少於100個字元' });
-const nameSchema = z
-  .string()
-  .trim()
-  .min(1, { message: '請輸入暱稱' })
-  .max(50, { message: '暱稱最多50個字元' });
+
 
 export const loginSchema = z.object({
   username: usernameSchema,

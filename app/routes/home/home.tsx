@@ -1,21 +1,20 @@
-import { Button, Card, Divider, Flex, Menu, Text, Title } from '@mantine/core';
-import { Link, useOutletContext, useSubmit } from 'react-router';
+import { Card, Divider, Flex, Menu, Text, Title } from '@mantine/core';
+import { Link, useNavigate, useOutletContext, useSubmit } from 'react-router';
 import authServices from '~/services/auth-services';
 import chatroomServices, { type Member } from '~/services/chatroom-services';
 import customNotifications from '~/utils/customNotifications';
 import type { Route } from './+types/home';
-import { MdAdd } from 'react-icons/md';
 import { useDisclosure } from '@mantine/hooks';
 import CreateChatroomModal from '~/routes/home/components/create-chatroom-modal';
 import { Fragment } from 'react';
 import chatroomUtils from '~/utils/chatroom';
-import { IoMdMore } from 'react-icons/io';
 import ConfirmModal from '~/components/confirm-modal';
+import MoreButton from '~/components/more-button';
 
 export const clientLoader = async () => {
   const chatrooms = await chatroomServices.getChatrooms();
 
-  return chatrooms.chatroom;
+  return chatrooms?.chatroom;
 };
 
 export const clientAction = async ({ request }: Route.ClientActionArgs) => {
@@ -26,7 +25,7 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
     case 'logout': {
       const res = await authServices.logout();
 
-      if (res) customNotifications.showSuccess('登出成功')
+      if (res) customNotifications.showSuccess('登出成功');
 
       break;
     }
@@ -56,10 +55,11 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
   const [createModalOpened, createModalHandler] = useDisclosure(false);
   const { user }: { user: Member } = useOutletContext() || {};
   const submit = useSubmit();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await submit({ intent: 'logout' }, { method: 'delete' })
-  }
+    await submit({ intent: 'logout' }, { method: 'delete' });
+  };
 
   return (
     <>
@@ -69,23 +69,23 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
         <meta name='description' content='聊天室' />
       </>
       <main>
-        <Flex py={18} px={18} align='center' justify='space-between'>
+        <Flex p={18} align='center' justify='space-between'>
           <Title size={24}>聊天室</Title>
           <Menu>
             <Menu.Target>
-              <Button
-                variant='transparent'
-                color='black'
-                fz={20}
-                px='xs'
-              >
-                <IoMdMore />
-              </Button>
+              <MoreButton />
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Menu.Item onClick={createModalHandler.open}>創建聊天室</Menu.Item>
-              <Menu.Item c='red' onClick={confirmModalHandler.open}>登出</Menu.Item>
+              <Menu.Item onClick={createModalHandler.open}>
+                創建聊天室
+              </Menu.Item>
+              <Menu.Item onClick={() => navigate(`/users/${user.id}`)}>
+                修改使用者資料
+              </Menu.Item>
+              <Menu.Item c='red' onClick={confirmModalHandler.open}>
+                登出
+              </Menu.Item>
             </Menu.Dropdown>
           </Menu>
         </Flex>
@@ -96,7 +96,8 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
                 <Link to={`/chatroom/${item.id}`}>
                   <Flex justify='space-between' py={8}>
                     <Title order={2} size={18}>
-                      {item.name || chatroomUtils.getRoomName(item.members, user?.id)}
+                      {item.name ||
+                        chatroomUtils.getRoomName(item.members, user?.id)}
                     </Title>
                     <Text>{item.members.length}人</Text>
                   </Flex>
@@ -112,7 +113,10 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
           title='確認登出'
           onConfirm={handleLogout}
         />
-        <CreateChatroomModal opened={createModalOpened} onClose={createModalHandler.close} />
+        <CreateChatroomModal
+          opened={createModalOpened}
+          onClose={createModalHandler.close}
+        />
       </main>
     </>
   );

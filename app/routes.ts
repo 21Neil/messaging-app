@@ -11,5 +11,6 @@ export default [
     route('register', 'routes/register/register.tsx'),
     route('login', 'routes/login/login.tsx'),
     route('chatroom/:id', 'routes/chatroom/chatroom.tsx'),
+    route('users/:id', 'routes/user/user.tsx'),
   ]),
 ] satisfies RouteConfig;
