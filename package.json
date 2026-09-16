@@ -15,6 +15,7 @@
     "@mantine/notifications": "^9.5.0",
     "@react-router/node": "^8.3.0",
     "@react-router/serve": "^8.3.0",
+    "browser-image-compression": "^2.0.2",
     "dayjs": "^1.11.21",
     "isbot": "^5.1.36",
     "react": "^19.2.7",

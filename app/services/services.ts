@@ -61,3 +61,11 @@ export const apiDelete = <T = any>(endpoint: string): Promise<T> =>
     method: 'DELETE',
     credentials: 'include',
   });
+
+export const apiPatchFormdata = <T = any>(endpoint: string, body: FormData): Promise<T> =>
+  customFetch(endpoint, {
+    method: 'PATCH',
+    credentials: 'include',
+    body
+  });
+

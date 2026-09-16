@@ -1,0 +1,14 @@
+.avatarLabel {
+  width: 100px;
+  height: 100px;
+  z-index: 99;
+  display: block;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.avatarInput {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}

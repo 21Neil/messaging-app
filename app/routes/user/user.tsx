@@ -1,15 +1,16 @@
-import { Button, Flex, Stack, TextInput, Title } from '@mantine/core';
-import { schemaResolver, useForm } from '@mantine/form';
-import { useNavigate, useOutletContext, useSubmit } from 'react-router';
+import {
+  Flex,
+  Stack,
+  Title,
+} from '@mantine/core';
+import { useNavigate, useOutletContext } from 'react-router';
 import BackButton from '~/components/back-button';
 import type { Member } from '~/services/chatroom-services';
-import userServices, {
-  changeNameSchema,
-  type changeNameFormValues,
-} from '~/services/user-services';
 import type { Route } from './+types/user';
 import customNotifications from '~/utils/customNotifications';
-import { useEffect } from 'react';
+import AvatarForm from './components/avatar-form';
+import userServices from '~/services/user-services';
+import ChangeNameForm from './components/change-name-form';
 
 export const clientAction = async ({
   request,
@@ -29,34 +30,29 @@ export const clientAction = async ({
 
       if (res) customNotifications.showSuccess('修改成功');
     }
+    case 'changeAvatar': {
+      const avatar = (formdata.get('avatar') as File) || null;
+      const oldAvatarUrl = formdata.get('oldAvatarUrl')?.toString() || '';
+      const body = new FormData();
+
+      body.append('avatar', avatar);
+      body.append('oldAvatarUrl', oldAvatarUrl)
+
+      const res = await userServices.changeAvatar(id, body);
+
+      if (res) customNotifications.showSuccess('修改成功');
+    }
   }
 };
 
 const User = () => {
-  const { user, getUser }: { user: Member, getUser: () => void } = useOutletContext() || {};
+  const { user, getUser }: { user: Member; getUser: () => void } =
+    useOutletContext() || {};
   const navigate = useNavigate();
-  const submit = useSubmit();
-  const changeNameForm = useForm({
-    mode: 'uncontrolled',
-    initialValues: {
-      name: user?.name,
-    },
-    validate: schemaResolver(changeNameSchema),
-  });
 
   const handleBack = () => {
     navigate(-1);
   };
-
-  const handleChangeNameSubmit = async (values: changeNameFormValues) => {
-    await submit({ ...values, intent: 'changeName' }, { method: 'post' });
-    getUser();
-  };
-
-  useEffect(() => {
-    changeNameForm.setInitialValues({ name: user?.name });
-    changeNameForm.reset();
-  }, [user?.name]);
 
   return (
     <>
@@ -71,27 +67,8 @@ const User = () => {
           <Title size={24}>修改使用者資料</Title>
         </Flex>
         <Stack px={16}>
-          <form onSubmit={changeNameForm.onSubmit(handleChangeNameSubmit)}>
-            <TextInput
-              key={changeNameForm.key('name')}
-              {...changeNameForm.getInputProps('name')}
-              label='暱稱'
-              mb={8}
-            />
-            <Button
-              type='button'
-              px={8}
-              disabled={!changeNameForm.isDirty()}
-              onClick={changeNameForm.reset}
-              color='gray'
-              mr={4}
-            >
-              取消
-            </Button>
-            <Button type='submit' px={8} disabled={!changeNameForm.isDirty()}>
-              修改
-            </Button>
-          </form>
+          <AvatarForm {...{ getUser }} avatarUrl={user?.avatar} />
+          <ChangeNameForm {...{ getUser }} name={user?.name} />
         </Stack>
       </main>
     </>
