@@ -26,7 +26,7 @@ export const registerSchema = z
     password: passwordSchema,
     confirmPassword: passwordSchema,
   })
-  .refine(data => !(data.password !== data.confirmPassword), {
+  .refine(data => data.password === data.confirmPassword, {
     error: '密碼不一致',
     path: ['confirmPassword'],
   });

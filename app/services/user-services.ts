@@ -1,5 +1,5 @@
 import z from 'zod';
-import { nameSchema } from './common-schema';
+import { nameSchema, passwordSchema } from './common-schema';
 import { apiPatch, apiPatchFormdata } from './services';
 
 export const changeNameSchema = z.object({
@@ -15,9 +15,29 @@ export const changeAvatarSchema = z.object({
 
 export type ChangeAvatarFormValues = z.infer<typeof changeAvatarSchema>;
 
+export const changePasswordSchema = z
+  .object({
+    password: passwordSchema,
+    newPassword: passwordSchema,
+    confirmPassword: passwordSchema,
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    error: '新密碼不一致',
+    path: ['confirmPassword'],
+  })
+  .refine(data => data.password !== data.newPassword, {
+    error: '新密碼不得與舊密碼相同',
+    path: ['newPassword'],
+  });
+
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+type ChangePasswordReq = Omit<ChangePasswordFormValues, 'confirmPassword'>;
+
 const userServices = {
-  changeName: (id: number, body: ChangeNameFormValues) => apiPatch(`/users/${id}/name`, body),
-  changeAvatar: (id: number, body: FormData) => apiPatchFormdata(`/users/${id}/avatars`, body),
+  changeName: (body: ChangeNameFormValues) => apiPatch('/users/name', body),
+  changeAvatar: (body: FormData) => apiPatchFormdata('/users/avatars', body),
+  changePassword: (body: ChangePasswordReq) =>
+    apiPatch('/users/password', body),
 };
 
 export default userServices;

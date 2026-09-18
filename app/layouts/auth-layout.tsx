@@ -1,10 +1,10 @@
-import { Outlet, redirect, useMatch, useNavigate } from 'react-router';
+import { Outlet, useMatch, useNavigate } from 'react-router';
 import type { Route } from './+types/auth-layout';
 import authServices from '~/services/auth-services';
 import customNotifications from '~/utils/customNotifications';
 import { useEffect, useState } from 'react';
 
-export const loader = async ({ request, pattern }: Route.LoaderArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const cookieHeader = request.headers.get('Cookie');
 
   if (!cookieHeader) return false;

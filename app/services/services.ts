@@ -1,6 +1,5 @@
 import createError from '~/utils/createError';
 import authServices from './auth-services';
-import { redirect } from 'react-router';
 import customNotifications from '~/utils/customNotifications';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -19,10 +18,8 @@ const customFetch = async (endpoint: string, options: RequestInit = {}) => {
 
     return body;
   } catch (err: any) {
-    console.log(err.statusCode, err.code);
     if (err.statusCode === 401 && err.code !== 'INVALID_CREDENTIALS') {
       authServices.logout();
-      throw redirect('/login');
     }
     customNotifications.showError(err.message || '連線失敗');
   }

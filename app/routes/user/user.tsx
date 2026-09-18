@@ -1,8 +1,4 @@
-import {
-  Flex,
-  Stack,
-  Title,
-} from '@mantine/core';
+import { Flex, Stack, Title } from '@mantine/core';
 import { useNavigate, useOutletContext } from 'react-router';
 import BackButton from '~/components/back-button';
 import type { Member } from '~/services/chatroom-services';
@@ -11,24 +7,21 @@ import customNotifications from '~/utils/customNotifications';
 import AvatarForm from './components/avatar-form';
 import userServices from '~/services/user-services';
 import ChangeNameForm from './components/change-name-form';
+import ChangePasswordFrom from './components/change-password-form';
 
-export const clientAction = async ({
-  request,
-  params,
-}: Route.ClientActionArgs) => {
+export const clientAction = async ({ request }: Route.ClientActionArgs) => {
   const formdata = await request.formData();
   const intent = formdata.get('intent');
-  const id = +params.id;
-
   switch (intent) {
     case 'changeName': {
       const name = formdata.get('name')?.toString();
 
       if (!name) break;
 
-      const res = await userServices.changeName(id, { name });
+      const res = await userServices.changeName({ name });
 
       if (res) customNotifications.showSuccess('修改成功');
+      break;
     }
     case 'changeAvatar': {
       const avatar = (formdata.get('avatar') as File) || null;
@@ -36,11 +29,26 @@ export const clientAction = async ({
       const body = new FormData();
 
       body.append('avatar', avatar);
-      body.append('oldAvatarUrl', oldAvatarUrl)
+      body.append('oldAvatarUrl', oldAvatarUrl);
 
-      const res = await userServices.changeAvatar(id, body);
+      const res = await userServices.changeAvatar(body);
 
       if (res) customNotifications.showSuccess('修改成功');
+      break;
+    }
+    case 'changePassword': {
+      const password = formdata.get('password')?.toString();
+      const newPassword = formdata.get('newPassword')?.toString();
+
+      if (!password || !newPassword) {
+        customNotifications.showError('未收到密碼或新密碼')
+        break;
+      }
+
+      const res = await userServices.changePassword({ password, newPassword })
+
+      if (res) customNotifications.showSuccess(res.message)
+      break;
     }
   }
 };
@@ -69,6 +77,7 @@ const User = () => {
         <Stack px={16}>
           <AvatarForm {...{ getUser }} avatarUrl={user?.avatar} />
           <ChangeNameForm {...{ getUser }} name={user?.name} />
+          <ChangePasswordFrom />
         </Stack>
       </main>
     </>
