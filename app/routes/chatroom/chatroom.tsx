@@ -18,7 +18,7 @@ export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
   const id = +params.id;
   const chatroom = await chatroomServices.getChatroom(id);
 
-  return chatroom.chatroom;
+  return chatroom?.chatroom;
 };
 
 export const clientAction = async ({
@@ -59,6 +59,16 @@ export const clientAction = async ({
 
       break;
     }
+    case 'send-image': {
+      const image = formdata.get('image') as File
+      const body = new FormData();
+
+      body.append('image', image);
+
+      await chatroomServices.createImage(id, body);
+
+      break;
+    }
 
     default:
       customNotifications.showError('未知的操作類型');
@@ -67,6 +77,9 @@ export const clientAction = async ({
 
 const Chatroom = ({ loaderData }: Route.ComponentProps) => {
   const roomData = loaderData;
+
+  if (!roomData) return;
+  
   const { user }: { user: Member } = useOutletContext() || {};
   const roomName = roomData?.name || chatroomUtils.getRoomName(roomData?.members, user?.id);
   const hasRoomName = !!roomData?.name;

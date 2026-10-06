@@ -15,7 +15,7 @@ const ChatArea = ({ messages, viewport, user }: ChatAreaProps) => {
   return (
     <ScrollArea
       viewportRef={viewport}
-      h='calc(100vh - 60px - 1px - 42px)'
+      h='calc(100vh - 60px - 1px - 48px)'
       px={6}
       scrollbarSize={6}
     >

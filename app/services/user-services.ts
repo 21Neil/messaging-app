@@ -36,8 +36,7 @@ type ChangePasswordReq = Omit<ChangePasswordFormValues, 'confirmPassword'>;
 const userServices = {
   changeName: (body: ChangeNameFormValues) => apiPatch('/users/name', body),
   changeAvatar: (body: FormData) => apiPatchFormdata('/users/avatars', body),
-  changePassword: (body: ChangePasswordReq) =>
-    apiPatch('/users/password', body),
+  changePassword: (body: ChangePasswordReq) => apiPatch('/users/password', body),
 };
 
 export default userServices;

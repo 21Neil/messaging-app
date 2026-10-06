@@ -66,3 +66,10 @@ export const apiPatchFormdata = <T = any>(endpoint: string, body: FormData): Pro
     body
   });
 
+export const apiPostFormdata = <T = any>(endpoint: string, body: FormData): Promise<T> =>
+  customFetch(endpoint, {
+    method: 'POST',
+    credentials: 'include',
+    body
+  })
+

@@ -6,7 +6,7 @@ import {
   changeAvatarSchema,
   type ChangeAvatarFormValues,
 } from '~/services/user-services';
-import { compressImg } from '~/utils/compressImg';
+import { compressAvatar } from '~/utils/compressImg';
 import styles from '../user.module.css';
 
 interface AvatarFormProps {
@@ -31,7 +31,7 @@ const AvatarForm = ({ getUser, avatarUrl }: AvatarFormProps) => {
     form.setFieldValue('avatar', value);
     if (!value) setAvatarPreviewUrl('');
     if (value) {
-      compressedAvatar.current = await compressImg(value);
+      compressedAvatar.current = await compressAvatar(value);
       setAvatarPreviewUrl(URL.createObjectURL(compressedAvatar.current));
     }
   };
@@ -45,7 +45,7 @@ const AvatarForm = ({ getUser, avatarUrl }: AvatarFormProps) => {
     const formdata = new FormData();
 
     if (values.avatar) {
-      const compressedImg = await compressImg(values.avatar);
+      const compressedImg = await compressAvatar(values.avatar);
 
       formdata.append('avatar', compressedImg);
       formdata.append('oldAvatarUrl', avatarUrl);

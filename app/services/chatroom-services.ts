@@ -1,5 +1,5 @@
 import z from 'zod';
-import { apiDelete, apiGet, apiPatch, apiPost } from './services';
+import { apiDelete, apiGet, apiPatch, apiPost, apiPostFormdata } from './services';
 import Chatroom from '~/routes/chatroom/chatroom';
 
 interface GetChatroomsRes {
@@ -31,6 +31,7 @@ export interface Message {
   chatroomId: number;
   senderId: number;
   sender: Sender;
+  type: 'text' | 'image';
 }
 
 interface Sender {
@@ -39,7 +40,7 @@ interface Sender {
   avatar: string;
 }
 
-const messageSchema = z.object({
+export const messageSchema = z.object({
   content: z.string().min(1),
 });
 
@@ -76,9 +77,15 @@ export const joinChatroomFormSchema = (hasRoomName: boolean) => z
   .refine(() => hasRoomName, {
     error: '請先變更聊天室名稱',
     path: ['usernames']
-  })
+  });
 
 export type JoinChatroomFormValues = z.infer<ReturnType<typeof joinChatroomFormSchema>>;
+
+export const createImageSchema = z.object({
+  image: z.file().nullable(),
+});
+
+export type CreateImageFromValues = z.infer<typeof createImageSchema>;
 
 const chatroomServices = {
   getChatrooms: () => apiGet<GetChatroomsRes>('/chatrooms'),
@@ -89,6 +96,7 @@ const chatroomServices = {
   deleteChatroom: (id: number) => apiDelete(`/chatrooms/${id}`),
   leaveChatroom: (id: number) => apiDelete(`/chatrooms/${id}/members`),
   joinChatroom: (id: number, body: JoinChatroomFormValues) => apiPost(`/chatrooms/${id}/members`, body),
+  createImage: (id: number, body: FormData) => apiPostFormdata(`/chatrooms/${id}/messages/images`, body),
 };
 
 export default chatroomServices;

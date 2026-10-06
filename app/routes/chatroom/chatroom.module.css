@@ -1,0 +1,27 @@
+.messageText {
+  word-break: break-word;
+}
+
+.messageImage {
+  min-width: 0;
+}
+
+.messageTime {
+  align-self: end;
+}
+
+.imageLabel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.imageInput {
+  display: none;
+}
+
+.messageInputForm {
+  width: 100%;
+}
