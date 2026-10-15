@@ -8,9 +8,10 @@ interface ChatAreaProps {
   messages: Message[];
   viewport: React.RefObject<HTMLDivElement | null>;
   user: Member;
+  scrollToBottom: () => void;
 }
 
-const ChatArea = ({ messages, viewport, user }: ChatAreaProps) => {
+const ChatArea = ({ messages, viewport, user, scrollToBottom }: ChatAreaProps) => {
 
   return (
     <ScrollArea
@@ -24,6 +25,7 @@ const ChatArea = ({ messages, viewport, user }: ChatAreaProps) => {
         const currDay = dayjs(message.createAt);
         const isSameDay =
           prevDay && prevDay.format('YYYYMMDD') === currDay.format('YYYYMMDD');
+        const isLastMessage = i === messages.length - 1;
 
         return (
           <Fragment key={message.id}>
@@ -38,7 +40,7 @@ const ChatArea = ({ messages, viewport, user }: ChatAreaProps) => {
                 {currDay.format('YYYY/M/D')}
               </Badge>
             )}
-            {user && <ChatMessage {...{ message }} userId={user.id} />}
+            {user && <ChatMessage {...{ message, isLastMessage, scrollToBottom }} userId={user.id} />}
           </Fragment>
         );
       })}

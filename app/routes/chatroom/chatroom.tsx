@@ -142,7 +142,7 @@ const Chatroom = ({ loaderData }: Route.ComponentProps) => {
             handleLeave={leaveConfirmModalHandlers.open}
             handleDelete={deleteConfirmModalHandlers.open}
           />
-          <ChatArea messages={messages} viewport={viewport} user={user} />
+          <ChatArea {...{ messages, viewport, user, scrollToBottom }} />
           <ChatInput />
         </Stack>
 

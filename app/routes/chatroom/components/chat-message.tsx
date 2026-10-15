@@ -6,9 +6,13 @@ import styles from '../chatroom.module.css';
 const ChatMessage = ({
   userId,
   message,
+  isLastMessage,
+  scrollToBottom,
 }: {
   userId: number;
   message: Message;
+  isLastMessage: boolean;
+  scrollToBottom: () => void;
 }) => {
   const isUser = userId === message.senderId;
   const time = dayjs(message.createAt).format('h:mm A');
@@ -45,6 +49,7 @@ const ChatMessage = ({
               src={message.content}
               radius={10}
               className={styles.messageImage}
+              onLoad={isLastMessage ? scrollToBottom : undefined}
             />
           )}
           <Text fz={9} textWrap='nowrap' className={styles.messageTime}>
