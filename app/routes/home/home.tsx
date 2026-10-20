@@ -9,7 +9,11 @@ import CreateChatroomModal from '~/routes/home/components/create-chatroom-modal'
 import { Fragment } from 'react';
 import chatroomUtils from '~/utils/chatroom';
 import ConfirmModal from '~/components/confirm-modal';
-import MoreButton from '~/components/more-button';
+import BasicButton from '~/components/basic-button';
+import { MdPeopleOutline } from 'react-icons/md';
+import { IoMdMore } from 'react-icons/io';
+import AddFriendModal from './components/add-friend-modal';
+import friendServices from '~/services/friend-services';
 
 export const clientLoader = async () => {
   const chatrooms = await chatroomServices.getChatrooms();
@@ -45,6 +49,18 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
       break;
     }
 
+    case 'add-friend': {
+      const username = formdata.get('username')?.toString();
+
+      if (!username) return customNotifications.showError('請輸入使用者名稱');
+
+      const res = await friendServices.addFriend({ username });
+
+      if (res) customNotifications.showSuccess('已送出邀請');
+
+      break;
+    }
+
     default:
       customNotifications.showError('未知的操作類型');
   }
@@ -53,6 +69,7 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
 const Home = ({ loaderData }: Route.ComponentProps) => {
   const [confirmModalOpened, confirmModalHandler] = useDisclosure(false);
   const [createModalOpened, createModalHandler] = useDisclosure(false);
+  const [addFriendModalOpened, addFriendModalHandler] = useDisclosure(false);
   const { user }: { user: Member } = useOutletContext() || {};
   const submit = useSubmit();
   const navigate = useNavigate();
@@ -70,10 +87,27 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
       </>
       <main>
         <Flex p={18} align='center' justify='space-between'>
-          <Title size={24}>聊天室</Title>
+          <Title size={24} mr='auto'>
+            聊天室
+          </Title>
           <Menu>
             <Menu.Target>
-              <MoreButton />
+              <BasicButton>
+                <MdPeopleOutline />
+              </BasicButton>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Item onClick={addFriendModalHandler.open}>
+                新增好友
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+          <Menu>
+            <Menu.Target>
+              <BasicButton>
+                <IoMdMore />
+              </BasicButton>
             </Menu.Target>
 
             <Menu.Dropdown>
@@ -116,6 +150,10 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
         <CreateChatroomModal
           opened={createModalOpened}
           onClose={createModalHandler.close}
+        />
+        <AddFriendModal
+          opened={addFriendModalOpened}
+          onClose={addFriendModalHandler.close}
         />
       </main>
     </>

@@ -1,7 +1,7 @@
 import { Divider, Flex, Menu, Title } from '@mantine/core';
+import { IoIosArrowBack, IoMdMore } from 'react-icons/io';
 import { useNavigate } from 'react-router';
-import BackButton from '~/components/back-button';
-import MoreButton from '~/components/more-button';
+import BasicButton from '~/components/basic-button';
 
 interface HeaderProps {
   roomName: string;
@@ -29,11 +29,15 @@ const Header = ({
   return (
     <>
       <Flex align='center' py='sm'>
-        <BackButton onClick={handleBack} />
-        <Title size={24}>{roomName}</Title>
+        <BasicButton onClick={handleBack}>
+          <IoIosArrowBack />
+        </BasicButton>
+        <Title mr='auto' size={24}>{roomName}</Title>
         <Menu>
           <Menu.Target>
-            <MoreButton />
+            <BasicButton>
+              <IoMdMore />
+            </BasicButton>
           </Menu.Target>
 
           <Menu.Dropdown>

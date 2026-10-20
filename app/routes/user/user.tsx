@@ -1,6 +1,5 @@
 import { Flex, Stack, Title } from '@mantine/core';
 import { useNavigate, useOutletContext } from 'react-router';
-import BackButton from '~/components/back-button';
 import type { Member } from '~/services/chatroom-services';
 import type { Route } from './+types/user';
 import customNotifications from '~/utils/customNotifications';
@@ -8,6 +7,8 @@ import AvatarForm from './components/avatar-form';
 import userServices from '~/services/user-services';
 import ChangeNameForm from './components/change-name-form';
 import ChangePasswordFrom from './components/change-password-form';
+import BasicButton from '~/components/basic-button';
+import { IoIosArrowBack } from 'react-icons/io';
 
 export const clientAction = async ({ request }: Route.ClientActionArgs) => {
   const formdata = await request.formData();
@@ -41,13 +42,13 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
       const newPassword = formdata.get('newPassword')?.toString();
 
       if (!password || !newPassword) {
-        customNotifications.showError('未收到密碼或新密碼')
+        customNotifications.showError('未收到密碼或新密碼');
         break;
       }
 
-      const res = await userServices.changePassword({ password, newPassword })
+      const res = await userServices.changePassword({ password, newPassword });
 
-      if (res) customNotifications.showSuccess(res.message)
+      if (res) customNotifications.showSuccess(res.message);
       break;
     }
   }
@@ -71,7 +72,9 @@ const User = () => {
       </>
       <main>
         <Flex py='sm' align='center'>
-          <BackButton onClick={handleBack} />
+          <BasicButton onClick={handleBack}>
+            <IoIosArrowBack />
+          </BasicButton>
           <Title size={24}>修改使用者資料</Title>
         </Flex>
         <Stack px={16}>

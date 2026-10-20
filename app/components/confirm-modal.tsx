@@ -1,4 +1,5 @@
-import { Button, Group, Modal, Text } from '@mantine/core';
+import { Button, Group } from '@mantine/core';
+import BasicModal from './basic-modal';
 
 interface ConfirmModalProps {
   opened: boolean;
@@ -14,12 +15,10 @@ const ConfirmModal = ({
   onConfirm,
 }: ConfirmModalProps) => {
   return (
-    <Modal
+    <BasicModal
       opened={opened}
       onClose={onClose}
       title={title}
-      withCloseButton={false}
-      centered
     >
       <Group justify='end'>
         <Button type='button' color='grey' onClick={onClose}>
@@ -29,7 +28,7 @@ const ConfirmModal = ({
           確認
         </Button>
       </Group>
-    </Modal>
+    </BasicModal>
   );
 };
 

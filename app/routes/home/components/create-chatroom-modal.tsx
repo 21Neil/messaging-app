@@ -1,11 +1,9 @@
 import {
   Button,
   Group,
-  Modal,
   Stack,
   TagsInput,
   TextInput,
-  type ModalProps,
 } from '@mantine/core';
 import { schemaResolver, useForm } from '@mantine/form';
 import {
@@ -13,8 +11,14 @@ import {
   type CreateChatroomFormValues,
 } from '~/services/chatroom-services';
 import { useSubmit } from 'react-router';
+import BasicModal from '~/components/basic-modal';
 
-const CreateChatroomModal = ({ opened, onClose }: ModalProps) => {
+interface CreateChatroomModalProps {
+  opened: boolean;
+  onClose: () => void;
+}
+
+const CreateChatroomModal = ({ opened, onClose }: CreateChatroomModalProps) => {
   const submit = useSubmit();
   const form = useForm({
     mode: 'uncontrolled',
@@ -37,14 +41,10 @@ const CreateChatroomModal = ({ opened, onClose }: ModalProps) => {
   };
 
   return (
-    <Modal
+    <BasicModal
       opened={opened}
       onClose={close}
       title='創建聊天室'
-      closeOnClickOutside={false}
-      closeOnEscape={false}
-      withCloseButton={false}
-      centered
     >
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack>
@@ -67,7 +67,7 @@ const CreateChatroomModal = ({ opened, onClose }: ModalProps) => {
           </Group>
         </Stack>
       </form>
-    </Modal>
+    </BasicModal>
   );
 };
 
