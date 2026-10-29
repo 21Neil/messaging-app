@@ -1,5 +1,5 @@
 import { Card, Divider, Flex, Menu, Text, Title } from '@mantine/core';
-import { Link, useNavigate, useOutletContext, useSubmit } from 'react-router';
+import { Link, redirect, useNavigate, useOutletContext, useSubmit } from 'react-router';
 import authServices from '~/services/auth-services';
 import chatroomServices, { type Member } from '~/services/chatroom-services';
 import customNotifications from '~/utils/customNotifications';
@@ -14,24 +14,30 @@ import { MdPeopleOutline } from 'react-icons/md';
 import { IoMdMore } from 'react-icons/io';
 import AddFriendModal from './components/add-friend-modal';
 import friendServices from '~/services/friend-services';
+import FriendRequestsModal from './components/friend-requests-modal';
 
 export const clientLoader = async () => {
-  const chatrooms = await chatroomServices.getChatrooms();
+  const [chatrooms, friendRequests] = await Promise.all([
+    chatroomServices.getChatrooms(),
+    friendServices.getFriendRequests(),
+  ]);
 
-  return chatrooms?.chatroom;
+  return {
+    chatrooms: chatrooms?.chatroom,
+    friendRequests: friendRequests,
+  };
 };
 
 export const clientAction = async ({ request }: Route.ClientActionArgs) => {
   const formdata = await request.formData();
   const intent = formdata.get('intent');
-
+  
   switch (intent) {
     case 'logout': {
       const res = await authServices.logout();
-
+      
       if (res) customNotifications.showSuccess('登出成功');
-
-      break;
+      throw redirect('login');
     }
 
     case 'create-chatroom': {
@@ -61,6 +67,19 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
       break;
     }
 
+    case 'accept-friend': {
+      const id = Number(formdata.get('id'));
+
+      if (!Number.isSafeInteger(id) || id <= 0)
+        return customNotifications.showError('無效的交友邀請');
+
+      const res = await friendServices.acceptFriend(id);
+
+      if (res) customNotifications.showSuccess('已同意交友邀請');
+
+      break;
+    }
+
     default:
       customNotifications.showError('未知的操作類型');
   }
@@ -70,6 +89,7 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
   const [confirmModalOpened, confirmModalHandler] = useDisclosure(false);
   const [createModalOpened, createModalHandler] = useDisclosure(false);
   const [addFriendModalOpened, addFriendModalHandler] = useDisclosure(false);
+  const [friendRequestsModalOpened, friendRequestsModalHandler] = useDisclosure(false);
   const { user }: { user: Member } = useOutletContext() || {};
   const submit = useSubmit();
   const navigate = useNavigate();
@@ -101,6 +121,12 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
               <Menu.Item onClick={addFriendModalHandler.open}>
                 新增好友
               </Menu.Item>
+              <Menu.Item onClick={friendRequestsModalHandler.open}>
+                交友邀請
+                {loaderData.friendRequests?.length
+                  ? ` (${loaderData.friendRequests.length})`
+                  : ''}
+              </Menu.Item>
             </Menu.Dropdown>
           </Menu>
           <Menu>
@@ -123,8 +149,8 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
             </Menu.Dropdown>
           </Menu>
         </Flex>
-        {loaderData &&
-          loaderData.map(item => (
+        {loaderData.chatrooms &&
+          loaderData.chatrooms.map(item => (
             <Fragment key={item.id}>
               <Card shadow='xs' mx={8} key={item.id}>
                 <Link to={`/chatroom/${item.id}`}>
@@ -154,6 +180,11 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
         <AddFriendModal
           opened={addFriendModalOpened}
           onClose={addFriendModalHandler.close}
+        />
+        <FriendRequestsModal
+          opened={friendRequestsModalOpened}
+          onClose={friendRequestsModalHandler.close}
+          requests={loaderData.friendRequests}
         />
       </main>
     </>
