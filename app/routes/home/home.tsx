@@ -15,16 +15,19 @@ import { IoMdMore } from 'react-icons/io';
 import AddFriendModal from './components/add-friend-modal';
 import friendServices from '~/services/friend-services';
 import FriendRequestsModal from './components/friend-requests-modal';
+import FriendsModal from './components/friends-modal';
 
 export const clientLoader = async () => {
-  const [chatrooms, friendRequests] = await Promise.all([
+  const [chatrooms, friendRequests, friends] = await Promise.all([
     chatroomServices.getChatrooms(),
     friendServices.getFriendRequests(),
+    friendServices.getFriends(),
   ]);
 
   return {
     chatrooms: chatrooms?.chatroom,
     friendRequests: friendRequests,
+    friends,
   };
 };
 
@@ -90,6 +93,7 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
   const [createModalOpened, createModalHandler] = useDisclosure(false);
   const [addFriendModalOpened, addFriendModalHandler] = useDisclosure(false);
   const [friendRequestsModalOpened, friendRequestsModalHandler] = useDisclosure(false);
+  const [friendsModalOpened, friendsModalHandler] = useDisclosure(false);
   const { user }: { user: Member } = useOutletContext() || {};
   const submit = useSubmit();
   const navigate = useNavigate();
@@ -112,12 +116,16 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
           </Title>
           <Menu>
             <Menu.Target>
-              <BasicButton>
+              <BasicButton aria-label='好友選單' type='button'>
                 <MdPeopleOutline />
               </BasicButton>
             </Menu.Target>
 
             <Menu.Dropdown>
+              <Menu.Item onClick={friendsModalHandler.open}>
+                朋友清單
+                {loaderData.friends ? ` (${loaderData.friends.length})` : ''}
+              </Menu.Item>
               <Menu.Item onClick={addFriendModalHandler.open}>
                 新增好友
               </Menu.Item>
@@ -185,6 +193,11 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
           opened={friendRequestsModalOpened}
           onClose={friendRequestsModalHandler.close}
           requests={loaderData.friendRequests}
+        />
+        <FriendsModal
+          opened={friendsModalOpened}
+          onClose={friendsModalHandler.close}
+          friends={loaderData.friends}
         />
       </main>
     </>
