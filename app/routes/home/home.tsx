@@ -1,4 +1,4 @@
-import { Card, Divider, Flex, Menu, Text, Title } from '@mantine/core';
+import { Card, Divider, Flex, Menu, Text, Title, useModalsStack } from '@mantine/core';
 import { Link, redirect, useNavigate, useOutletContext, useSubmit } from 'react-router';
 import authServices from '~/services/auth-services';
 import chatroomServices, { type Member } from '~/services/chatroom-services';
@@ -70,6 +70,19 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
       break;
     }
 
+    case 'delete-friend': {
+      const id = Number(formdata.get('id'));
+
+      if (!Number.isSafeInteger(id) || id <= 0)
+        customNotifications.showError('無效的朋友 ID');
+
+      const res = await friendServices.deleteFriend(id);
+
+      if (res) return customNotifications.showSuccess('已刪除朋友');
+      
+      break;
+    }
+
     case 'accept-friend': {
       const id = Number(formdata.get('id'));
 
@@ -93,7 +106,7 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
   const [createModalOpened, createModalHandler] = useDisclosure(false);
   const [addFriendModalOpened, addFriendModalHandler] = useDisclosure(false);
   const [friendRequestsModalOpened, friendRequestsModalHandler] = useDisclosure(false);
-  const [friendsModalOpened, friendsModalHandler] = useDisclosure(false);
+  const stack = useModalsStack(['friends', 'delete-friend'])
   const { user }: { user: Member } = useOutletContext() || {};
   const submit = useSubmit();
   const navigate = useNavigate();
@@ -122,7 +135,7 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Menu.Item onClick={friendsModalHandler.open}>
+              <Menu.Item onClick={() => stack.open('friends')}>
                 朋友清單
                 {loaderData.friends ? ` (${loaderData.friends.length})` : ''}
               </Menu.Item>
@@ -195,8 +208,7 @@ const Home = ({ loaderData }: Route.ComponentProps) => {
           requests={loaderData.friendRequests}
         />
         <FriendsModal
-          opened={friendsModalOpened}
-          onClose={friendsModalHandler.close}
+          stack={stack}
           friends={loaderData.friends}
         />
       </main>

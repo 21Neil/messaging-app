@@ -1,5 +1,5 @@
 import z from "zod";
-import { apiGet, apiPatch, apiPost } from "./services";
+import { apiDelete, apiGet, apiPatch, apiPost } from './services';
 import type { Member } from './chatroom-services';
 
 export interface FriendRequest {
@@ -21,6 +21,7 @@ const friendServices = {
   getFriends: () => apiGet<GetFriendsRes | undefined>('/friends'),
   getFriendRequests: () => apiGet<GetFriendRequestsRes | undefined>('/friends/invitations'),
   acceptFriend: (id: number) => apiPatch('/friends', { id }),
+  deleteFriend: (id: number) => apiDelete<{ message: string } | undefined>(`/friends/${id}`),
 }
 
 export default friendServices;
