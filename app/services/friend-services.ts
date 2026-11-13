@@ -16,12 +16,18 @@ export const addFriendSchema = z.object({
 
 export type AddFriendFormValues = z.infer<typeof addFriendSchema>;
 
+type friendStatuses = {
+  id: number;
+  online: boolean;
+}
+
 const friendServices = {
   addFriend: (body: AddFriendFormValues) => apiPost('/friends', body),
   getFriends: () => apiGet<GetFriendsRes | undefined>('/friends'),
   getFriendRequests: () => apiGet<GetFriendRequestsRes | undefined>('/friends/invitations'),
   acceptFriend: (id: number) => apiPatch('/friends', { id }),
   deleteFriend: (id: number) => apiDelete<{ message: string } | undefined>(`/friends/${id}`),
+  checkFriendStatuses: () => apiGet<friendStatuses[]>('/friends/statuses'),
 }
 
 export default friendServices;
