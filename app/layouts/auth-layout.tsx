@@ -3,6 +3,7 @@ import type { Route } from './+types/auth-layout';
 import authServices from '~/services/auth-services';
 import customNotifications from '~/utils/customNotifications';
 import { useEffect, useState } from 'react';
+import userServices from '~/services/user-services';
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const cookieHeader = request.headers.get('Cookie');
@@ -33,6 +34,20 @@ const AuthLayout = ({ loaderData }: Route.ComponentProps) => {
     if (hasToken && (loginMatch || registerMatch)) navigate('/');
     if (hasToken && !user) getUser();
     if (!hasToken) navigate('login');
+  }, [hasToken]);
+
+  useEffect(() => {
+    if (!hasToken) return;
+
+    const heartbeat = async () => {
+      await userServices.heartbeat();
+    };
+
+    heartbeat();
+
+    const intervalId = setInterval(heartbeat, 30000);
+
+    return () => clearInterval(intervalId);
   }, [hasToken]);
 
   return <Outlet context={{ user, getUser }} />;

@@ -1,6 +1,6 @@
 import z from 'zod';
 import { nameSchema, passwordSchema } from './common-schema';
-import { apiPatch, apiPatchFormdata } from './services';
+import { apiPatch, apiPatchFormdata, apiPost } from './services';
 
 export const changeNameSchema = z.object({
   name: nameSchema,
@@ -37,6 +37,7 @@ const userServices = {
   changeName: (body: ChangeNameFormValues) => apiPatch('/users/name', body),
   changeAvatar: (body: FormData) => apiPatchFormdata('/users/avatars', body),
   changePassword: (body: ChangePasswordReq) => apiPatch('/users/password', body),
+  heartbeat: () => apiPost('/users/heartbeat'),
 };
 
 export default userServices;

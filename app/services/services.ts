@@ -30,7 +30,7 @@ export const apiGet = <T = any>(endpoint: string): Promise<T> =>
     credentials: 'include',
   });
 
-export const apiPost = <T = any>(endpoint: string, body: unknown): Promise<T> =>
+export const apiPost = <T = any>(endpoint: string, body?: unknown): Promise<T> =>
   customFetch(endpoint, {
     method: 'POST',
     headers: {
