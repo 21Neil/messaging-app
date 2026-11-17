@@ -8,6 +8,8 @@ import userServices from '~/services/user-services';
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const cookieHeader = request.headers.get('Cookie');
 
+  console.log(cookieHeader)
+
   if (!cookieHeader) return false;
 
   return true;
@@ -31,6 +33,7 @@ const AuthLayout = ({ loaderData }: Route.ComponentProps) => {
   };
 
   useEffect(() => {
+    console.log(hasToken)
     if (hasToken && (loginMatch || registerMatch)) navigate('/');
     if (hasToken && !user) getUser();
     if (!hasToken) navigate('login');
