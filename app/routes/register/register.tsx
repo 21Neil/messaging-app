@@ -1,18 +1,12 @@
 import { Button, PasswordInput, Stack, TextInput, Title } from '@mantine/core';
 import { schemaResolver, useForm } from '@mantine/form';
-import { useNavigate, useSubmit } from 'react-router';
+import { redirect, useNavigate, useSubmit } from 'react-router';
 import authServices, {
   registerSchema,
   type RegisterFormValues,
 } from '~/services/auth-services';
 import type { Route } from './+types/register';
 import customNotifications from '~/utils/customNotifications';
-
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const cookieHeader = request.headers.get('Cookie');
-
-  if (cookieHeader) authServices.logout();
-};
 
 export const clientAction = async ({ request }: Route.ClientActionArgs) => {
   const formdata = await request.formData();
@@ -24,7 +18,11 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
     return customNotifications.showError('未收到使用者名稱或密碼');
   if (!name) return customNotifications.showError('未收到暱稱');
 
-  await authServices.register({ name, username, password });
+  const res = await authServices.register({ name, username, password });
+
+  if (!res) return;
+
+  return redirect('/');
 };
 
 const Register = () => {

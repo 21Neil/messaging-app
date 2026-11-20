@@ -10,7 +10,6 @@ export type ChangeNameFormValues = z.infer<typeof changeNameSchema>;
 
 export const changeAvatarSchema = z.object({
   avatar: z.file().nullable(),
-  oldAvatarUrl: z.string(),
 });
 
 export type ChangeAvatarFormValues = z.infer<typeof changeAvatarSchema>;

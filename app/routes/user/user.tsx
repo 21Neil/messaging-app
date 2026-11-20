@@ -55,8 +55,7 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
 };
 
 const User = () => {
-  const { user, getUser }: { user: Member; getUser: () => void } =
-    useOutletContext() || {};
+  const { user }: { user: Member } = useOutletContext() || {};
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -78,8 +77,8 @@ const User = () => {
           <Title size={24}>修改使用者資料</Title>
         </Flex>
         <Stack px={16}>
-          <AvatarForm {...{ getUser }} avatarUrl={user?.avatar} />
-          <ChangeNameForm {...{ getUser }} name={user?.name} />
+          <AvatarForm avatarUrl={user?.avatar} />
+          <ChangeNameForm name={user?.name} />
           <ChangePasswordFrom />
         </Stack>
       </main>

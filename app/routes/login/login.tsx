@@ -5,14 +5,8 @@ import authServices, {
   type LoginFormValues,
 } from '~/services/auth-services';
 import type { Route } from './+types/login';
-import { useNavigate, useSubmit } from 'react-router';
+import { redirect, useNavigate, useSubmit } from 'react-router';
 import customNotification from '~/utils/customNotifications';
-
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const cookieHeader = request.headers.get('Cookie');
-
-  if (cookieHeader) authServices.logout();
-};
 
 export const clientAction = async ({ request }: Route.ClientActionArgs) => {
   const formdata = await request.formData();
@@ -22,7 +16,11 @@ export const clientAction = async ({ request }: Route.ClientActionArgs) => {
   if (!username || !password)
     return customNotification.showError('未收到使用者名稱或密碼');
 
-  await authServices.login({ username, password });
+  const res = await authServices.login({ username, password });
+  
+  if (!res) return;
+
+  return redirect('/');
 };
 
 const Login = () => {

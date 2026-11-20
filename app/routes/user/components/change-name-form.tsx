@@ -8,11 +8,10 @@ import {
 } from '~/services/user-services';
 
 interface ChangeNameFromProps {
-  getUser: () => void;
   name: string;
 }
 
-const ChangeNameForm = ({ getUser, name }: ChangeNameFromProps) => {
+const ChangeNameForm = ({ name }: ChangeNameFromProps) => {
   const submit = useSubmit();
   const form = useForm({
     mode: 'uncontrolled',
@@ -24,7 +23,6 @@ const ChangeNameForm = ({ getUser, name }: ChangeNameFromProps) => {
 
   const handleSubmit = async (values: ChangeNameFormValues) => {
     await submit({ ...values, intent: 'changeName' }, { method: 'patch' });
-    getUser();
   };
 
   useEffect(() => {

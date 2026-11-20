@@ -10,11 +10,10 @@ import { compressAvatar } from '~/utils/compressImg';
 import styles from '../user.module.css';
 
 interface AvatarFormProps {
-  getUser: () => void;
   avatarUrl: string;
 }
 
-const AvatarForm = ({ getUser, avatarUrl }: AvatarFormProps) => {
+const AvatarForm = ({ avatarUrl }: AvatarFormProps) => {
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState('');
   const submit = useSubmit();
   const compressedAvatar = useRef<File | null>(null);
@@ -22,7 +21,6 @@ const AvatarForm = ({ getUser, avatarUrl }: AvatarFormProps) => {
     mode: 'uncontrolled',
     initialValues: {
       avatar: null,
-      oldAvatarUrl: '',
     },
     validate: schemaResolver(changeAvatarSchema),
   });
@@ -48,12 +46,10 @@ const AvatarForm = ({ getUser, avatarUrl }: AvatarFormProps) => {
       const compressedImg = await compressAvatar(values.avatar);
 
       formdata.append('avatar', compressedImg);
-      formdata.append('oldAvatarUrl', avatarUrl);
     }
 
     formdata.append('intent', 'changeAvatar');
     await submit(formdata, { method: 'patch', encType: 'multipart/form-data' });
-    getUser();
     form.reset();
   };
 

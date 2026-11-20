@@ -18,9 +18,12 @@ const customFetch = async (endpoint: string, options: RequestInit = {}) => {
 
     return body;
   } catch (err: any) {
+    if (err.statusCode === 401 && endpoint === '/auth/me') return;
+
     if (err.statusCode === 401 && err.code !== 'INVALID_CREDENTIALS') {
       authServices.logout();
     }
+    
     customNotifications.showError(err.message || '連線失敗');
   }
 };
@@ -30,7 +33,10 @@ export const apiGet = <T = any>(endpoint: string): Promise<T> =>
     credentials: 'include',
   });
 
-export const apiPost = <T = any>(endpoint: string, body?: unknown): Promise<T> =>
+export const apiPost = <T = any>(
+  endpoint: string,
+  body?: unknown,
+): Promise<T> =>
   customFetch(endpoint, {
     method: 'POST',
     headers: {
@@ -59,17 +65,22 @@ export const apiDelete = <T = any>(endpoint: string): Promise<T> =>
     credentials: 'include',
   });
 
-export const apiPatchFormdata = <T = any>(endpoint: string, body: FormData): Promise<T> =>
+export const apiPatchFormdata = <T = any>(
+  endpoint: string,
+  body: FormData,
+): Promise<T> =>
   customFetch(endpoint, {
     method: 'PATCH',
     credentials: 'include',
-    body
+    body,
   });
 
-export const apiPostFormdata = <T = any>(endpoint: string, body: FormData): Promise<T> =>
+export const apiPostFormdata = <T = any>(
+  endpoint: string,
+  body: FormData,
+): Promise<T> =>
   customFetch(endpoint, {
     method: 'POST',
     credentials: 'include',
-    body
-  })
-
+    body,
+  });
